@@ -1,14 +1,20 @@
 {
   "name": "koinara-worldland",
   "private": true,
+  "type": "module",
   "workspaces": [
     "node"
   ],
   "scripts": {
-    "build": "npm run build --workspace node",
+    "build": "npm run typecheck:scripts && npm run build --workspace node",
     "setup": "npm run setup --workspace node",
     "node": "npm run start --workspace node",
-    "typecheck": "npm run typecheck --workspace node",
+    "node:once": "npm run start:once --workspace node",
+    "node:doctor": "npm run doctor --workspace node",
+    "typecheck:scripts": "tsc -p tsconfig.scripts.json --noEmit",
+    "typecheck": "npm run typecheck:scripts && npm run typecheck --workspace node",
+    "doctor:testnet": "tsx deploy/doctor.ts --profile testnet",
+    "doctor:mainnet": "tsx deploy/doctor.ts --profile mainnet",
     "deploy:testnet": "tsx deploy/deploy.ts --profile testnet",
     "deploy:mainnet": "tsx deploy/deploy.ts --profile mainnet",
     "verify:testnet": "tsx deploy/verify.ts --profile testnet",

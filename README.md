@@ -34,11 +34,19 @@ git submodule update --init --recursive
 npm install
 ```
 
+You can check how close the repository is to deployment readiness with:
+
+```bash
+npm run doctor:testnet
+```
+
 4. Compile the protocol contracts with Foundry:
 
 ```bash
 forge build
 ```
+
+If `forge` is blocked on the current machine, you can still use the TypeScript-side checks and prepare configs first. Deployment itself still requires built artifacts.
 
 5. Generate local node configuration:
 
@@ -46,10 +54,22 @@ forge build
 npm run setup
 ```
 
+After setup, you can validate the node-side configuration with:
+
+```bash
+npm run node:doctor
+```
+
 6. Start the node:
 
 ```bash
 npm run node
+```
+
+For a single non-daemon pass:
+
+```bash
+npm run node:once
 ```
 
 ## Deployment Flow
@@ -69,3 +89,7 @@ The protocol stores only hashes on-chain. Public nodes therefore rely on an off-
 - Submission discovery: `receipts/<jobId>-<responseHash>.json`
 
 The full format is documented in [docs/network-spec.md](docs/network-spec.md).
+
+## Final Human-Only Steps
+
+The last operator-only tasks are documented in [docs/final-operator-steps.md](docs/final-operator-steps.md).

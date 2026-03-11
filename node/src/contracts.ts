@@ -97,6 +97,27 @@ export function buildContracts(
   };
 }
 
+export function rebuildContracts(
+  provider: JsonRpcProvider,
+  walletPrivateKey: string,
+  manifest: DeploymentManifest
+): KoinaraContracts {
+  const wallet = new Wallet(walletPrivateKey, provider);
+
+  return {
+    provider,
+    wallet,
+    registry: new Contract(manifest.contractAddresses.registry, registryAbi, wallet),
+    verifier: new Contract(manifest.contractAddresses.verifier, verifierAbi, wallet),
+    rewardDistributor: new Contract(
+      manifest.contractAddresses.rewardDistributor,
+      rewardDistributorAbi,
+      wallet
+    ),
+    token: new Contract(manifest.contractAddresses.token, tokenAbi, wallet)
+  };
+}
+
 export function asJob(job: OnChainJob): OnChainJob {
   return job;
 }

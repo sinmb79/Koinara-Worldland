@@ -35,6 +35,8 @@ export interface DeploymentManifest {
   deployTxHashes: Record<string, string>;
   blockNumbers: Record<string, number>;
   chainId: number;
+  deployer?: string;
+  rpcUrlUsed?: string;
   epochParams: {
     genesisTimestamp: number;
     epochDuration: number;
@@ -75,6 +77,7 @@ export interface RuntimeConfig {
   rootDir: string;
   role: NodeRole;
   walletPrivateKey: string;
+  walletSource: "env" | "keyfile";
   chainProfile: ChainProfileName;
   chain: ChainConfig;
   deploymentManifest: DeploymentManifest;
@@ -82,6 +85,8 @@ export interface RuntimeConfig {
   manifestRoots: string[];
   receiptRoots: string[];
   artifactOutputDir: string;
+  rpcCandidates: string[];
+  selectedRpcUrl?: string;
   provider?: FileNodeConfig["provider"];
   verifier?: FileNodeConfig["verifier"];
   openAiApiKey?: string;

@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { dirname, resolve } from "node:path";
@@ -30,10 +30,11 @@ async function main(): Promise<void> {
       "./.koinara-worldland/artifacts"
     );
     const pollIntervalMs = Number(await ask(rl, "Polling interval in milliseconds", "10000"));
-    const privateKeyOrPath = await ask(rl, "Wallet private key or path to key file", "");
-    const privateKey = privateKeyOrPath.startsWith("0x")
-      ? privateKeyOrPath
-      : readFileSync(resolve(packageRoot, privateKeyOrPath), "utf8").trim();
+    const privateKeyOrPath = await ask(
+      rl,
+      "Wallet private key or path to key file (leave blank to fill later)",
+      ""
+    );
 
     let providerConfig: FileNodeConfig["provider"] | undefined;
     if (role === "provider" || role === "both") {
@@ -78,11 +79,15 @@ async function main(): Promise<void> {
     };
 
     writeJson(resolve(packageRoot, "node.config.json"), fileConfig);
-    writeEnv(resolve(packageRoot, ".env.local"), {
-      WALLET_PRIVATE_KEY: privateKey,
-      NODE_ROLE: role,
-      OPENAI_API_KEY: providerConfig?.backend === "openai" ? "" : undefined
-    });
+    writeEnv(
+      resolve(packageRoot, ".env.local"),
+      buildEnvTemplate({
+        packageRoot,
+        role,
+        openAiEnabled: providerConfig?.backend === "openai",
+        walletInput: privateKeyOrPath
+      })
+    );
 
     const runtimeDirs = [sharedRoot, artifactOutputDir].map((entry) => resolve(packageRoot, entry));
     runtimeDirs.forEach((dir) => mkdirSync(dir, { recursive: true }));
@@ -129,6 +134,35 @@ function writeEnv(path: string, values: Record<string, string | undefined>): voi
     .filter(([, value]) => value !== undefined)
     .map(([key, value]) => `${key}=${value ?? ""}`);
   writeFileSync(path, `${lines.join("\n")}\n`, "utf8");
+}
+
+function buildEnvTemplate(input: {
+  packageRoot: string;
+  role: NodeRole;
+  openAiEnabled: boolean;
+  walletInput: string;
+}): Record<string, string | undefined> {
+  const values: Record<string, string | undefined> = {
+    NODE_ROLE: input.role
+  };
+
+  if (!input.walletInput) {
+    values.WALLET_PRIVATE_KEY = "";
+    values.WALLET_KEYFILE = "";
+  } else if (input.walletInput.startsWith("0x")) {
+    values.WALLET_PRIVATE_KEY = input.walletInput;
+  } else {
+    if (!existsSync(resolve(input.packageRoot, input.walletInput))) {
+      console.warn(`Warning: key file does not exist yet: ${input.walletInput}`);
+    }
+    values.WALLET_KEYFILE = input.walletInput;
+  }
+
+  if (input.openAiEnabled) {
+    values.OPENAI_API_KEY = "";
+  }
+
+  return values;
 }
 
 void main();

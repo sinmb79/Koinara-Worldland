@@ -1,32 +1,21 @@
-import { spawnSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
 import { ethers } from "ethers";
 import "dotenv/config";
-
-type Profile = "testnet" | "mainnet";
-
-type ChainConfig = {
-  chainId: number;
-  rpcUrl: string;
-  backupRpcUrls: string[];
-  explorerBaseUrl: string;
-  confirmationsRequired: number;
-  nativeToken: Record<string, unknown>;
-};
-
-type DeployParams = {
-  epochDuration: number;
-  halvingInterval: number;
-  initialEpochEmission: string;
-  expectedTokenCap: string;
-  gitRef: string;
-};
+import {
+  ROOT,
+  ensureFoundryBuild,
+  getProfileFromArgv,
+  getRpcCandidates,
+  loadChainConfig,
+  loadDeployParams,
+  loadPrivateKeyFromEnv,
+  resolveHealthyRpcUrl
+} from "./common.js";
 
 type Artifact = {
-  abi: unknown[];
+  abi: ethers.InterfaceAbi;
   bytecode: { object: string };
 };
 
@@ -35,6 +24,8 @@ type Manifest = {
   deployTxHashes: Record<string, string>;
   blockNumbers: Record<string, number>;
   chainId: number;
+  deployer: string;
+  rpcUrlUsed: string;
   epochParams: {
     genesisTimestamp: number;
     epochDuration: number;
@@ -44,35 +35,6 @@ type Manifest = {
   tokenCap: string;
   gitRef: string;
 };
-
-const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
-
-function getProfile(): Profile {
-  const profileFlag = process.argv.find((arg) => arg.startsWith("--profile"));
-  if (!profileFlag) {
-    throw new Error("Missing --profile testnet|mainnet");
-  }
-
-  const [, maybeValue] = profileFlag.split("=");
-  const value = maybeValue ?? process.argv[process.argv.indexOf(profileFlag) + 1];
-  if (value !== "testnet" && value !== "mainnet") {
-    throw new Error("Profile must be testnet or mainnet");
-  }
-
-  return value;
-}
-
-function ensureFoundryBuild(): void {
-  const result = spawnSync("forge", ["build"], {
-    cwd: ROOT,
-    stdio: "inherit",
-    shell: process.platform === "win32"
-  });
-
-  if (result.status !== 0) {
-    throw new Error("forge build failed");
-  }
-}
 
 function loadJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
@@ -86,11 +48,12 @@ function loadArtifact(name: string): Artifact {
 async function deployContract(
   signer: ethers.Wallet,
   artifact: Artifact,
+  confirmationsRequired: number,
   args: unknown[] = []
-): Promise<{ contract: ethers.Contract; hash: string; blockNumber: number }> {
+): Promise<{ contract: ethers.BaseContract; hash: string; blockNumber: number }> {
   const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode.object, signer);
   const contract = await factory.deploy(...args);
-  const receipt = await contract.deploymentTransaction()?.wait();
+  const receipt = await contract.deploymentTransaction()?.wait(confirmationsRequired);
   if (!receipt) {
     throw new Error("Missing deployment receipt");
   }
@@ -103,10 +66,11 @@ async function deployContract(
 }
 
 async function sendAndWait(
-  txPromise: Promise<ethers.ContractTransactionResponse>
+  txPromise: Promise<ethers.ContractTransactionResponse>,
+  confirmationsRequired: number
 ): Promise<{ hash: string; blockNumber: number }> {
   const tx = await txPromise;
-  const receipt = await tx.wait();
+  const receipt = await tx.wait(confirmationsRequired);
   if (!receipt) {
     throw new Error("Missing transaction receipt");
   }
@@ -115,32 +79,43 @@ async function sendAndWait(
 }
 
 async function main(): Promise<void> {
-  const profile = getProfile();
-  const chain = loadJson<ChainConfig>(resolve(ROOT, "config", `chain.${profile}.json`));
-  const params = loadJson<DeployParams>(resolve(ROOT, "deploy", `params.${profile}.json`));
-
-  if (!process.env.PRIVATE_KEY) {
-    throw new Error("PRIVATE_KEY is required");
-  }
-  if (!chain.rpcUrl) {
-    throw new Error(`config/chain.${profile}.json is missing rpcUrl`);
-  }
+  const profile = getProfileFromArgv();
+  const chain = loadChainConfig(profile);
+  const params = loadDeployParams(profile);
+  const { privateKey } = loadPrivateKeyFromEnv("PRIVATE_KEY", "PRIVATE_KEY_FILE");
 
   ensureFoundryBuild();
 
-  const provider = new ethers.JsonRpcProvider(chain.rpcUrl, chain.chainId || undefined);
-  const deployer = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
-  const genesisTimestamp = Math.floor(Date.now() / 1000);
+  const rpcUrl = await resolveHealthyRpcUrl(getRpcCandidates(chain), chain.chainId);
+  const provider = new ethers.JsonRpcProvider(rpcUrl, chain.chainId || undefined);
+  const deployer = new ethers.Wallet(privateKey, provider);
+  const genesisTimestamp =
+    process.env.GENESIS_TIMESTAMP && process.env.GENESIS_TIMESTAMP.trim()
+      ? Number(process.env.GENESIS_TIMESTAMP)
+      : Math.floor(Date.now() / 1000);
 
   const registryArtifact = loadArtifact("InferenceJobRegistry");
   const verifierArtifact = loadArtifact("ProofOfInferenceVerifier");
   const tokenArtifact = loadArtifact("KOINToken");
   const distributorArtifact = loadArtifact("RewardDistributor");
 
-  const registry = await deployContract(deployer, registryArtifact, [deployer.address]);
-  const verifier = await deployContract(deployer, verifierArtifact, [registry.contract.target]);
-  const token = await deployContract(deployer, tokenArtifact, [deployer.address]);
-  const distributor = await deployContract(deployer, distributorArtifact, [
+  const registry = await deployContract(deployer, registryArtifact, chain.confirmationsRequired, [
+    deployer.address
+  ]);
+  const verifier = await deployContract(
+    deployer,
+    verifierArtifact,
+    chain.confirmationsRequired,
+    [registry.contract.target]
+  );
+  const token = await deployContract(deployer, tokenArtifact, chain.confirmationsRequired, [
+    deployer.address
+  ]);
+  const distributor = await deployContract(
+    deployer,
+    distributorArtifact,
+    chain.confirmationsRequired,
+    [
     token.contract.target,
     registry.contract.target,
     verifier.contract.target,
@@ -148,7 +123,8 @@ async function main(): Promise<void> {
     params.epochDuration,
     params.halvingInterval,
     params.initialEpochEmission
-  ]);
+    ]
+  );
 
   const registryContract = new ethers.Contract(
     registry.contract.target,
@@ -157,11 +133,14 @@ async function main(): Promise<void> {
   );
   const tokenContract = new ethers.Contract(token.contract.target, tokenArtifact.abi, deployer);
 
-  await sendAndWait(registryContract.setVerifier(verifier.contract.target));
-  await sendAndWait(registryContract.setRewardDistributor(distributor.contract.target));
-  await sendAndWait(tokenContract.setMinter(distributor.contract.target));
-  await sendAndWait(registryContract.renounceAdmin());
-  await sendAndWait(tokenContract.renounceAdmin());
+  await sendAndWait(registryContract.setVerifier(verifier.contract.target), chain.confirmationsRequired);
+  await sendAndWait(
+    registryContract.setRewardDistributor(distributor.contract.target),
+    chain.confirmationsRequired
+  );
+  await sendAndWait(tokenContract.setMinter(distributor.contract.target), chain.confirmationsRequired);
+  await sendAndWait(registryContract.renounceAdmin(), chain.confirmationsRequired);
+  await sendAndWait(tokenContract.renounceAdmin(), chain.confirmationsRequired);
 
   const manifest: Manifest = {
     contractAddresses: {
@@ -185,6 +164,8 @@ async function main(): Promise<void> {
     chainId: await provider
       .getNetwork()
       .then((network) => Number(network.chainId)),
+    deployer: deployer.address,
+    rpcUrlUsed: rpcUrl,
     epochParams: {
       genesisTimestamp,
       epochDuration: params.epochDuration,

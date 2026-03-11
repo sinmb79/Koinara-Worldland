@@ -1,34 +1,24 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import process from "node:process";
-import { fileURLToPath } from "node:url";
 import { ethers } from "ethers";
 import "dotenv/config";
-
-type Profile = "testnet" | "mainnet";
-
-type ChainConfig = {
-  chainId: number;
-  rpcUrl: string;
-  backupRpcUrls: string[];
-  explorerBaseUrl: string;
-  confirmationsRequired: number;
-  nativeToken: Record<string, unknown>;
-};
-
-type DeployParams = {
-  epochDuration: number;
-  halvingInterval: number;
-  initialEpochEmission: string;
-  expectedTokenCap: string;
-  gitRef: string;
-};
+import {
+  ROOT,
+  getProfileFromArgv,
+  getRpcCandidates,
+  loadChainConfig,
+  loadDeployParams,
+  resolveHealthyRpcUrl
+} from "./common.js";
 
 type DeploymentManifest = {
   contractAddresses: Record<string, string>;
   deployTxHashes: Record<string, string>;
   blockNumbers: Record<string, number>;
   chainId: number;
+  deployer?: string;
+  rpcUrlUsed?: string;
   epochParams: {
     genesisTimestamp: number;
     epochDuration: number;
@@ -38,8 +28,6 @@ type DeploymentManifest = {
   tokenCap: string;
   gitRef: string;
 };
-
-const ROOT = resolve(fileURLToPath(new URL("..", import.meta.url)));
 
 const registryAbi = [
   "function verifier() view returns (address)",
@@ -64,21 +52,6 @@ function loadJson<T>(path: string): T {
   return JSON.parse(readFileSync(path, "utf8")) as T;
 }
 
-function getProfile(): Profile {
-  const profileFlag = process.argv.find((arg) => arg.startsWith("--profile"));
-  if (!profileFlag) {
-    throw new Error("Missing --profile testnet|mainnet");
-  }
-
-  const [, maybeValue] = profileFlag.split("=");
-  const value = maybeValue ?? process.argv[process.argv.indexOf(profileFlag) + 1];
-  if (value !== "testnet" && value !== "mainnet") {
-    throw new Error("Profile must be testnet or mainnet");
-  }
-
-  return value;
-}
-
 async function assertEqual<T>(label: string, actual: T, expected: T): Promise<void> {
   if (actual !== expected) {
     throw new Error(`${label} failed: expected ${expected}, got ${actual}`);
@@ -88,18 +61,15 @@ async function assertEqual<T>(label: string, actual: T, expected: T): Promise<vo
 }
 
 async function main(): Promise<void> {
-  const profile = getProfile();
-  const chain = loadJson<ChainConfig>(resolve(ROOT, "config", `chain.${profile}.json`));
-  const params = loadJson<DeployParams>(resolve(ROOT, "deploy", `params.${profile}.json`));
+  const profile = getProfileFromArgv();
+  const chain = loadChainConfig(profile);
+  const params = loadDeployParams(profile);
   const manifest = loadJson<DeploymentManifest>(
     resolve(ROOT, "deployments", `worldland-${profile}.json`)
   );
 
-  if (!chain.rpcUrl) {
-    throw new Error(`config/chain.${profile}.json is missing rpcUrl`);
-  }
-
-  const provider = new ethers.JsonRpcProvider(chain.rpcUrl, chain.chainId || undefined);
+  const rpcUrl = await resolveHealthyRpcUrl(getRpcCandidates(chain), chain.chainId);
+  const provider = new ethers.JsonRpcProvider(rpcUrl, chain.chainId || undefined);
   const registry = new ethers.Contract(
     manifest.contractAddresses.registry,
     registryAbi,
@@ -143,6 +113,7 @@ async function main(): Promise<void> {
     String(manifest.epochParams.genesisTimestamp)
   );
   await assertEqual("gitRef", manifest.gitRef, params.gitRef);
+  await assertEqual("manifest.chainId", String(manifest.chainId), String(chain.chainId));
 
   console.log("Worldland deployment verification completed successfully.");
 }

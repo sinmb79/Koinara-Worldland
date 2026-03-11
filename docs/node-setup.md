@@ -21,9 +21,15 @@ The setup wizard creates:
 - `node/node.config.json`
 - `node/.env.local`
 
+If you do not want to paste a private key directly, you can leave it blank during setup and later fill either:
+
+- `WALLET_PRIVATE_KEY`
+- `WALLET_KEYFILE`
+
 ## Start the Node
 
 ```bash
+npm run node:doctor
 npm run node
 ```
 

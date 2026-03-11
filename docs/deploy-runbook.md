@@ -9,12 +9,21 @@
 ## Commands
 
 ```bash
+npm run doctor:testnet
 forge build
 npm run deploy:testnet
 npm run verify:testnet
 ```
 
 For mainnet, swap `testnet` with `mainnet`.
+
+If `forge` is unavailable on the current workstation, you can still run:
+
+```bash
+npm run doctor:testnet
+```
+
+to validate configuration readiness first. Actual deployment still needs the Foundry artifacts.
 
 ## Deployment Outputs
 
@@ -29,6 +38,8 @@ Each manifest contains:
 - `deployTxHashes`
 - `blockNumbers`
 - `chainId`
+- `deployer`
+- `rpcUrlUsed`
 - `epochParams`
 - `tokenCap`
 - `gitRef`
