@@ -1,10 +1,16 @@
 node_modules/
 out/
 cache/
+config/*.local.json
 node/dist/
 node/.env
 node/.env.local
 node/.koinara-worldland/
+node/.koinara-worldland-v2/
+.koinara-worldland-v2/
+.tmp-anvil.err.log
+.tmp-anvil.out.log
 deployments/*.local.json
 deployments/worldland-*.json
 !deployments/.gitkeep
+!deployments/worldland-mainnet-v2.json

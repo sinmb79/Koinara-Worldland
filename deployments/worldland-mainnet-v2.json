@@ -1,0 +1,35 @@
+{
+  "contractAddresses": {
+    "registry": "0x865315BE82c432A45BB68C959413026F6202e368",
+    "verifier": "0x3b63deb3632b2484bAb6069281f08642ab112b16",
+    "token": "0x7749473E36a8d6E741d9E581106E81CacAb7832a",
+    "nodeRegistry": "0x243fB879fBE521c5c227Da9EF731968413755131",
+    "rewardDistributor": "0x6Db94C2c93af7b0B5345C66535D5dC7cD9225126"
+  },
+  "deployTxHashes": {
+    "registry": "0xdb69b461863bdd82629f0b59d28ff9f5c471b9ca345370692a9d5913f1694b45",
+    "verifier": "0x63170e28048f9bd4db34f09562c38e6deb63384b40541d06114a440cbab4d9b0",
+    "token": "0x9f0bf05a68d9feb27152dd8fb5ea1e861f87c972db577c1dcac48ddb00dd3488",
+    "nodeRegistry": "0x6797ed618966f16e73ede8cc4ba5b90c117d0956a4dd072a51064ad4ab0d12f1",
+    "rewardDistributor": "0x9c693b380c48d79b038511e9b9ab9f8d1fd8d6506af2e7cde28e00007f001bb7"
+  },
+  "blockNumbers": {
+    "registry": 8202477,
+    "verifier": 8202481,
+    "token": 8202485,
+    "nodeRegistry": 8202489,
+    "rewardDistributor": 8202492
+  },
+  "chainId": 103,
+  "deployer": "0xf95232Ae6a716862799C90239028fb590C9bB307",
+  "rpcUrlUsed": "https://seoul.worldland.foundation/",
+  "epochParams": {
+    "genesisTimestamp": 1773231933,
+    "epochDuration": 86400,
+    "halvingInterval": 365,
+    "initialEpochEmission": "1000000000000000000000",
+    "activePoolBps": 2000
+  },
+  "tokenCap": "2100000000000000000000000000",
+  "gitRef": "v0.1.6-v2"
+}

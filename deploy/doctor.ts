@@ -1,8 +1,17 @@
 import { existsSync, readFileSync } from "node:fs";
+import { relative } from "node:path";
 import { resolve } from "node:path";
 import process from "node:process";
 import "dotenv/config";
-import { ROOT, getProfileFromArgv, hasForgeInstalled, isPlaceholderConfig, loadChainConfig, loadDeployParams } from "./common.js";
+import {
+  ROOT,
+  getProfileFromArgv,
+  hasForgeInstalled,
+  isPlaceholderConfig,
+  loadChainConfig,
+  loadDeployParams,
+  resolveChainConfigPath
+} from "./common.js";
 
 async function main(): Promise<void> {
   const profile = getProfileFromArgv();
@@ -59,7 +68,7 @@ async function main(): Promise<void> {
   }
 
   console.log(`Koinara-Worldland doctor for ${profile}`);
-  console.log(`Config file: config/chain.${profile}.json`);
+  console.log(`Config file: ${relative(ROOT, resolveChainConfigPath(profile))}`);
   console.log(`Params file: deploy/params.${profile}.json`);
 
   if (warnings.length > 0) {

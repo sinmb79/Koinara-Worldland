@@ -1,4 +1,4 @@
-import { Contract, JsonRpcProvider, Wallet } from "ethers";
+import { Contract, JsonRpcProvider, NonceManager, Wallet } from "ethers";
 import type {
   DeploymentManifest,
   JobStateName,
@@ -82,18 +82,19 @@ export function buildContracts(
 ): KoinaraContracts {
   const provider = new JsonRpcProvider(rpcUrl, chainId || undefined);
   const wallet = new Wallet(walletPrivateKey, provider);
+  const signer = new NonceManager(wallet);
 
   return {
     provider,
     wallet,
-    registry: new Contract(manifest.contractAddresses.registry, registryAbi, wallet),
-    verifier: new Contract(manifest.contractAddresses.verifier, verifierAbi, wallet),
+    registry: new Contract(manifest.contractAddresses.registry, registryAbi, signer),
+    verifier: new Contract(manifest.contractAddresses.verifier, verifierAbi, signer),
     rewardDistributor: new Contract(
       manifest.contractAddresses.rewardDistributor,
       rewardDistributorAbi,
-      wallet
+      signer
     ),
-    token: new Contract(manifest.contractAddresses.token, tokenAbi, wallet)
+    token: new Contract(manifest.contractAddresses.token, tokenAbi, signer)
   };
 }
 
@@ -103,18 +104,19 @@ export function rebuildContracts(
   manifest: DeploymentManifest
 ): KoinaraContracts {
   const wallet = new Wallet(walletPrivateKey, provider);
+  const signer = new NonceManager(wallet);
 
   return {
     provider,
     wallet,
-    registry: new Contract(manifest.contractAddresses.registry, registryAbi, wallet),
-    verifier: new Contract(manifest.contractAddresses.verifier, verifierAbi, wallet),
+    registry: new Contract(manifest.contractAddresses.registry, registryAbi, signer),
+    verifier: new Contract(manifest.contractAddresses.verifier, verifierAbi, signer),
     rewardDistributor: new Contract(
       manifest.contractAddresses.rewardDistributor,
       rewardDistributorAbi,
-      wallet
+      signer
     ),
-    token: new Contract(manifest.contractAddresses.token, tokenAbi, wallet)
+    token: new Contract(manifest.contractAddresses.token, tokenAbi, signer)
   };
 }
 

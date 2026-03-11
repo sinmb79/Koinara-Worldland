@@ -1,12 +1,11 @@
 {
-  "chainId": 0,
-  "rpcUrl": "",
+  "chainId": 103,
+  "rpcUrl": "https://seoul.worldland.foundation/",
   "backupRpcUrls": [],
-  "explorerBaseUrl": "",
+  "explorerBaseUrl": "https://scan.worldland.foundation/",
   "confirmationsRequired": 3,
   "nativeToken": {
-    "type": "erc20",
-    "symbol": "WL",
-    "address": ""
+    "type": "native",
+    "symbol": "WLC"
   }
 }

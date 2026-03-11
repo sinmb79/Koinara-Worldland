@@ -7,7 +7,7 @@ Mainnet deployment is allowed only after all earlier phases succeed.
 1. Run `forge build`
 2. Start `anvil`
 3. Run `npm run deploy:testnet` against the local RPC override
-4. Generate a canary manifest with `npm run e2e`
+4. Generate and publish a canary `Simple` job with `npm run canary:testnet`
 5. Start one provider node and one verifier node
 6. Confirm the canary `Simple` job reaches `Settled`
 

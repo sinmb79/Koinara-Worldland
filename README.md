@@ -2,13 +2,14 @@
 
 `Koinara-Worldland` is the deployment and node software repository for running `Koinara` on Worldland.
 
-This repository does not modify the protocol. The protocol source is vendored as a read-only git submodule at `vendor/koinara`, pinned to [`sinmb79/koinara@v0.1.6`](https://github.com/sinmb79/koinara/releases/tag/v0.1.6).
+This repository does not modify the protocol. The protocol source is vendored as a read-only git submodule at `vendor/koinara`, pinned to [`sinmb79/koinara@v0.1.6`](https://github.com/sinmb79/koinara/releases/tag/v0.1.6) for the v1 line while carrying the parallel Worldland v2 deployment path.
 
 ## Scope
 
 - Deploy and verify the `Koinara` protocol contracts on Worldland.
 - Provide a node program that anyone can run as a provider, a verifier, or both.
 - Define the off-chain manifest and receipt rules needed for public nodes to interoperate with the on-chain hash-only protocol.
+- Maintain both the legacy v1 path and the live Worldland v2 path.
 
 ## Repository Layout
 
@@ -78,8 +79,27 @@ npm run node:once
 - `npm run verify:testnet`
 - `npm run deploy:mainnet`
 - `npm run verify:mainnet`
+- `npm run deploy:v2:testnet`
+- `npm run verify:v2:testnet`
+- `npm run deploy:v2:mainnet`
+- `npm run verify:v2:mainnet`
+- `npm run canary:v2:mainnet`
 
 The required rehearsal sequence is documented in [docs/mainnet-checklist.md](docs/mainnet-checklist.md).
+
+## Live Worldland v2 Deployment
+
+Worldland v2 is live on mainnet.
+
+- `registry`: `0x865315BE82c432A45BB68C959413026F6202e368`
+- `verifier`: `0x3b63deb3632b2484bAb6069281f08642ab112b16`
+- `token`: `0x7749473E36a8d6E741d9E581106E81CacAb7832a`
+- `nodeRegistry`: `0x243fB879fBE521c5c227Da9EF731968413755131`
+- `rewardDistributor`: `0x6Db94C2c93af7b0B5345C66535D5dC7cD9225126`
+
+The generated manifest is:
+
+- `deployments/worldland-mainnet-v2.json`
 
 ## Network Interop
 

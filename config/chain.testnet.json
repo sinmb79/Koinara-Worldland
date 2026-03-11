@@ -1,9 +1,9 @@
 {
-  "chainId": 0,
-  "rpcUrl": "http://localhost:8545",
+  "chainId": 10395,
+  "rpcUrl": "https://gwangju.worldland.foundation/",
   "backupRpcUrls": [],
-  "explorerBaseUrl": "",
-  "confirmationsRequired": 1,
+  "explorerBaseUrl": "https://scan.worldland.foundation/",
+  "confirmationsRequired": 2,
   "nativeToken": {
     "type": "native",
     "symbol": "WLC"

@@ -18,8 +18,17 @@
     "doctor:mainnet": "tsx deploy/doctor.ts --profile mainnet",
     "deploy:testnet": "tsx deploy/deploy.ts --profile testnet",
     "deploy:mainnet": "tsx deploy/deploy.ts --profile mainnet",
+    "deploy:v2:testnet": "tsx deploy/deploy-v2.ts --profile testnet",
+    "deploy:v2:mainnet": "tsx deploy/deploy-v2.ts --profile mainnet",
     "verify:testnet": "tsx deploy/verify.ts --profile testnet",
     "verify:mainnet": "tsx deploy/verify.ts --profile mainnet",
+    "verify:v2:testnet": "tsx deploy/verify-v2.ts --profile testnet",
+    "verify:v2:mainnet": "tsx deploy/verify-v2.ts --profile mainnet",
+    "canary:testnet": "tsx deploy/canary.ts --profile testnet",
+    "canary:mainnet": "tsx deploy/canary.ts --profile mainnet",
+    "canary:v2:testnet": "tsx deploy/canary.ts --profile testnet",
+    "canary:v2:mainnet": "tsx deploy/canary.ts --profile mainnet",
+    "rehearse:v2:local": "powershell -ExecutionPolicy Bypass -File scripts/rehearse-v2-local.ps1",
     "e2e": "tsx deploy/e2e.ts"
   },
   "devDependencies": {

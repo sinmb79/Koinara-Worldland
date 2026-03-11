@@ -35,15 +35,14 @@ export function loadRuntimeConfig(options?: { allowMissingWallet?: boolean }): R
   const chainProfile = (process.env.CHAIN_PROFILE ?? fileConfig.chainProfile) as ChainProfileName;
   const role = (process.env.NODE_ROLE ?? "provider") as NodeRole;
 
-  const chainPath = resolve(rootDir, "config", `chain.${chainProfile}.json`);
-  const chain = JSON.parse(readFileSync(chainPath, "utf8")) as ChainConfig;
+  const chain = loadChainConfig(rootDir, chainProfile);
   const deploymentManifestPath = resolve(packageRoot, fileConfig.deploymentManifestPath);
   const deploymentManifest = JSON.parse(
     readFileSync(deploymentManifestPath, "utf8")
   ) as DeploymentManifest;
 
   const walletResolution = loadWallet(packageRoot, options?.allowMissingWallet === true);
-  const rpcCandidates = getRpcCandidates(chain, process.env.RPC_URL);
+  const rpcCandidates = getRpcCandidates(chain, process.env.RPC_URL ?? process.env.WORLDLAND_RPC_URL);
 
   return {
     packageRoot,
@@ -99,4 +98,38 @@ function resolveMaybe(baseDir: string, target: string): string {
   }
 
   return resolve(baseDir, target);
+}
+
+function loadChainConfig(rootDir: string, chainProfile: ChainProfileName): ChainConfig {
+  const chainPath = resolveChainPath(rootDir, chainProfile);
+  const chain = JSON.parse(readFileSync(chainPath, "utf8")) as ChainConfig;
+  const chainIdOverride = readIntegerEnv("CHAIN_ID") ?? readIntegerEnv("WORLDLAND_CHAIN_ID");
+
+  return {
+    ...chain,
+    chainId: chainIdOverride ?? chain.chainId
+  };
+}
+
+function resolveChainPath(rootDir: string, chainProfile: ChainProfileName): string {
+  const localOverride = resolve(rootDir, "config", `chain.${chainProfile}.local.json`);
+  if (existsSync(localOverride)) {
+    return localOverride;
+  }
+
+  return resolve(rootDir, "config", `chain.${chainProfile}.json`);
+}
+
+function readIntegerEnv(name: string): number | undefined {
+  const value = process.env[name]?.trim();
+  if (!value) {
+    return undefined;
+  }
+
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${name} must be a positive integer when set`);
+  }
+
+  return parsed;
 }
