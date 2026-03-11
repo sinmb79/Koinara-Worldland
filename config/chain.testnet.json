@@ -1,0 +1,11 @@
+{
+  "chainId": 0,
+  "rpcUrl": "http://localhost:8545",
+  "backupRpcUrls": [],
+  "explorerBaseUrl": "",
+  "confirmationsRequired": 1,
+  "nativeToken": {
+    "type": "native",
+    "symbol": "WLC"
+  }
+}

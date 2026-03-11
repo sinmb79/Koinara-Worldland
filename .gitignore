@@ -1,0 +1,10 @@
+node_modules/
+out/
+cache/
+node/dist/
+node/.env
+node/.env.local
+node/.koinara-worldland/
+deployments/*.local.json
+deployments/worldland-*.json
+!deployments/.gitkeep

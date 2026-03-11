@@ -1,0 +1,24 @@
+{
+  "name": "koinara-worldland",
+  "private": true,
+  "workspaces": [
+    "node"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace node",
+    "setup": "npm run setup --workspace node",
+    "node": "npm run start --workspace node",
+    "typecheck": "npm run typecheck --workspace node",
+    "deploy:testnet": "tsx deploy/deploy.ts --profile testnet",
+    "deploy:mainnet": "tsx deploy/deploy.ts --profile mainnet",
+    "verify:testnet": "tsx deploy/verify.ts --profile testnet",
+    "verify:mainnet": "tsx deploy/verify.ts --profile mainnet",
+    "e2e": "tsx deploy/e2e.ts"
+  },
+  "devDependencies": {
+    "dotenv": "^16.6.1",
+    "ethers": "^6.15.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.2"
+  }
+}

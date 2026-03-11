@@ -1,0 +1,3 @@
+[submodule "vendor/koinara"]
+	path = vendor/koinara
+	url = https://github.com/sinmb79/koinara.git

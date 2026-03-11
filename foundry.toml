@@ -1,0 +1,9 @@
+[profile.default]
+src = "vendor/koinara/contracts"
+test = "vendor/koinara/test"
+script = "deploy"
+out = "out"
+libs = ["vendor/koinara/lib", "lib"]
+solc_version = "0.8.24"
+evm_version = "paris"
+optimizer = false

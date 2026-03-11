@@ -1,0 +1,7 @@
+{
+  "epochDuration": 86400,
+  "halvingInterval": 365,
+  "initialEpochEmission": "1000000000000000000000",
+  "expectedTokenCap": "2100000000000000000000000000",
+  "gitRef": "v0.1.6"
+}

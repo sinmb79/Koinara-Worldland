@@ -1,0 +1,30 @@
+{
+  "chainProfile": "testnet",
+  "deploymentManifestPath": "../deployments/worldland-testnet.json",
+  "pollIntervalMs": 10000,
+  "manifestRoots": [
+    "./.koinara-worldland/network"
+  ],
+  "receiptRoots": [
+    "./.koinara-worldland/network"
+  ],
+  "artifactOutputDir": "./.koinara-worldland/artifacts",
+  "provider": {
+    "backend": "ollama",
+    "supportedJobTypes": [
+      "Simple"
+    ],
+    "ollama": {
+      "baseUrl": "http://127.0.0.1:11434",
+      "model": "llama3.1"
+    }
+  },
+  "verifier": {
+    "supportedJobTypes": [
+      "Simple",
+      "General",
+      "Collective"
+    ],
+    "supportedSchemaHashes": []
+  }
+}
