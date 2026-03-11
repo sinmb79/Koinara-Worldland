@@ -6,6 +6,7 @@
     "node"
   ],
   "scripts": {
+    "ci:sanity": "tsx scripts/ci-sanity.ts",
     "build": "npm run typecheck:scripts && npm run build --workspace node",
     "setup": "npm run setup --workspace node",
     "node": "npm run start --workspace node",

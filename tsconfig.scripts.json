@@ -7,6 +7,7 @@
     ]
   },
   "include": [
-    "deploy/**/*.ts"
+    "deploy/**/*.ts",
+    "scripts/**/*.ts"
   ]
 }
