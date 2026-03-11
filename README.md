@@ -59,7 +59,7 @@ npm run node
 - `npm run deploy:mainnet`
 - `npm run verify:mainnet`
 
-The required rehearsal sequence is documented in [docs/mainnet-checklist.md](D:/신명범(25.07.01.~)/개인파일/제4의 길/Koinara-Worldland/docs/mainnet-checklist.md).
+The required rehearsal sequence is documented in [docs/mainnet-checklist.md](docs/mainnet-checklist.md).
 
 ## Network Interop
 
@@ -68,4 +68,4 @@ The protocol stores only hashes on-chain. Public nodes therefore rely on an off-
 - Job discovery: `jobs/<requestHash>.json`
 - Submission discovery: `receipts/<jobId>-<responseHash>.json`
 
-The full format is documented in [docs/network-spec.md](D:/신명범(25.07.01.~)/개인파일/제4의 길/Koinara-Worldland/docs/network-spec.md).
+The full format is documented in [docs/network-spec.md](docs/network-spec.md).

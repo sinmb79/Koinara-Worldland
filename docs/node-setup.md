@@ -42,4 +42,4 @@ The role comes from `NODE_ROLE=provider|verifier|both`.
 ## Shared Manifest Roots
 
 If your provider and verifier run on different machines, point them to a shared discovery root.
-The node uses the hash-addressed rules from [docs/network-spec.md](D:/신명범(25.07.01.~)/개인파일/제4의 길/Koinara-Worldland/docs/network-spec.md).
+The node uses the hash-addressed rules from [docs/network-spec.md](./network-spec.md).

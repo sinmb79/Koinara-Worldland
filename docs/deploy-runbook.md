@@ -43,4 +43,4 @@ The deployment order matches the actual `koinara@v0.1.6` wiring:
 4. `RewardDistributor`
 5. wire addresses and renounce admin privileges
 
-That order follows the protocol reference implementation in [vendor/koinara/script/Deploy.s.sol](D:/신명범(25.07.01.~)/개인파일/제4의 길/Koinara-Worldland/vendor/koinara/script/Deploy.s.sol).
+That order follows the protocol reference implementation in [`vendor/koinara/script/Deploy.s.sol`](../vendor/koinara/script/Deploy.s.sol).
