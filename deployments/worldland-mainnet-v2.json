@@ -21,8 +21,6 @@
     "rewardDistributor": 8202492
   },
   "chainId": 103,
-  "deployer": "0xf95232Ae6a716862799C90239028fb590C9bB307",
-  "rpcUrlUsed": "https://seoul.worldland.foundation/",
   "epochParams": {
     "genesisTimestamp": 1773231933,
     "epochDuration": 86400,

@@ -8,11 +8,11 @@ The repository is designed so that the final human-only tasks are limited to sec
    - `config/chain.testnet.json`
    - `config/chain.mainnet.json`
 2. Provide the deployer key by one of these methods:
-   - `PRIVATE_KEY`
-   - `PRIVATE_KEY_FILE`
+   - `PRIVATE_KEY_FILE` (recommended)
+   - `PRIVATE_KEY` (legacy/unsafe)
 3. Provide each node wallet by one of these methods:
-   - `WALLET_PRIVATE_KEY`
-   - `WALLET_KEYFILE`
+   - `WALLET_KEYFILE` (recommended)
+   - `WALLET_PRIVATE_KEY` (legacy/unsafe)
 4. Fund the deployer and node wallets with the native asset needed for gas.
 5. If using the OpenAI backend, set `OPENAI_API_KEY`.
 6. Approve the actual mainnet broadcast after Anvil, testnet, and fork rehearsals pass.

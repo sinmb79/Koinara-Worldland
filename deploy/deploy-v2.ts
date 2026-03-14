@@ -25,8 +25,6 @@ type Manifest = {
   deployTxHashes: Record<string, string>;
   blockNumbers: Record<string, number>;
   chainId: number;
-  deployer: string;
-  rpcUrlUsed: string;
   epochParams: {
     genesisTimestamp: number;
     epochDuration: number;
@@ -113,6 +111,9 @@ async function main(): Promise<void> {
     process.env.GENESIS_TIMESTAMP && process.env.GENESIS_TIMESTAMP.trim()
       ? Number(process.env.GENESIS_TIMESTAMP)
       : Math.floor(Date.now() / 1000);
+  if (!Number.isInteger(genesisTimestamp) || genesisTimestamp > Math.floor(Date.now() / 1000)) {
+    throw new Error("GENESIS_TIMESTAMP must be an integer that is not in the future");
+  }
 
   const registryArtifact = loadArtifact("InferenceJobRegistry");
   const verifierArtifact = loadArtifact("ProofOfInferenceVerifier");
@@ -217,8 +218,6 @@ async function main(): Promise<void> {
       rewardDistributor: distributor.blockNumber
     },
     chainId: await provider.getNetwork().then((network) => Number(network.chainId)),
-    deployer: deployerWallet.address,
-    rpcUrlUsed: rpcUrl,
     epochParams: {
       genesisTimestamp,
       epochDuration: params.epochDuration,

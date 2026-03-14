@@ -5,6 +5,7 @@ config/*.local.json
 node/dist/
 node/.env
 node/.env.local
+node/.env.*.local
 node/.koinara-worldland/
 node/.koinara-worldland-v2/
 .koinara-worldland-v2/
@@ -14,3 +15,4 @@ deployments/*.local.json
 deployments/worldland-*.json
 !deployments/.gitkeep
 !deployments/worldland-mainnet-v2.json
+*.key

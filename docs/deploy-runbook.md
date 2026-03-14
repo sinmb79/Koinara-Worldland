@@ -5,7 +5,8 @@
 - `config/chain.testnet.json` or `config/chain.mainnet.json`
 - optional local override: `config/chain.testnet.local.json` or `config/chain.mainnet.local.json`
 - `deploy/params.testnet.json` or `deploy/params.mainnet.json`
-- `PRIVATE_KEY` in the shell environment
+- `PRIVATE_KEY_FILE`
+- `CREATOR_PRIVATE_KEY_FILE` for canary jobs
 
 For local Anvil rehearsals, prefer a `.local.json` override or temporary `CHAIN_ID` / `RPC_URL`
 environment variables instead of editing the tracked Worldland profiles.
@@ -55,11 +56,11 @@ Each manifest contains:
 - `deployTxHashes`
 - `blockNumbers`
 - `chainId`
-- `deployer`
-- `rpcUrlUsed`
 - `epochParams`
 - `tokenCap`
 - `gitRef`
+
+Sensitive operator details such as the deployer address, key source, and exact RPC endpoint are intentionally excluded from committed manifests.
 
 ## Canary Job
 

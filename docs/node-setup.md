@@ -21,10 +21,11 @@ The setup wizard creates:
 - `node/node.config.json`
 - `node/.env.local`
 
-If you do not want to paste a private key directly, you can leave it blank during setup and later fill either:
+Prefer a key file instead of pasting raw secrets into `.env.local`. If you leave the wallet blank
+during setup, fill one of these later:
 
-- `WALLET_PRIVATE_KEY`
 - `WALLET_KEYFILE`
+- `WALLET_PRIVATE_KEY` (legacy/unsafe)
 
 ## Start the Node
 
